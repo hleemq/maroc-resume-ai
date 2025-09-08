@@ -2,156 +2,112 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
+const logStep = (step: string, details?: any) => {
+  const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
+  console.log(`[AI-GENERATE-CONTENT] ${step}${detailsStr}`);
 };
 
 serve(async (req) => {
-  if (req.method === "OPTIONS") {
+  if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    logStep("Function started");
+
+    const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+    if (!openAIApiKey) {
+      throw new Error("OPENAI_API_KEY is not set");
+    }
+
     const supabaseClient = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
-      { auth: { persistSession: false } }
+      Deno.env.get("SUPABASE_ANON_KEY") ?? ""
     );
 
-    // Get authenticated user
-    const authHeader = req.headers.get("Authorization")!;
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) {
+      throw new Error("No authorization header provided");
+    }
+
     const token = authHeader.replace("Bearer ", "");
-    const { data: { user }, error: authError } = await supabaseClient.auth.getUser(token);
-    
-    if (authError || !user) {
-      throw new Error("Unauthorized");
-    }
+    const { data: userData, error: userError } = await supabaseClient.auth.getUser(token);
+    if (userError) throw new Error(`Authentication error: ${userError.message}`);
+    const user = userData.user;
+    if (!user) throw new Error("User not authenticated");
 
-    const { content_type, input_data, language = 'en', resume_id } = await req.json();
+    const { content_type, input_data, language = 'ar' } = await req.json();
 
-    // Check user's AI generations remaining
-    const { data: profile } = await supabaseClient
-      .from('profiles')
-      .select('ai_generations_remaining, subscription_tier')
-      .eq('id', user.id)
-      .single();
-
-    if (!profile || profile.ai_generations_remaining <= 0) {
-      return new Response(
-        JSON.stringify({ error: "No AI generations remaining. Please upgrade to premium." }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 402 }
-      );
-    }
-
-    // Get OpenAI API key from secrets
-    const openaiApiKey = Deno.env.get("OPENAI_API_KEY");
-    if (!openaiApiKey) {
-      throw new Error("OpenAI API key not configured");
-    }
-
+    // Generate prompt based on content type
     let prompt = "";
-    let generatedContent = "";
+    let systemPrompt = "أنت مساعد ذكي متخصص في كتابة السير الذاتية المهنية للسوق المغربي. اكتب باللغة العربية بشكل مهني ومناسب لأنظمة ATS.";
 
     switch (content_type) {
-      case "professional_summary":
-        prompt = `Create a professional summary for a CV in ${language} language. 
-        Input: ${JSON.stringify(input_data)}
-        Requirements:
-        - 2-3 sentences maximum
-        - Professional tone
-        - Highlight key skills and experience
-        - Tailored for Moroccan job market
-        - Language: ${language === 'ar' ? 'Arabic' : language === 'fr' ? 'French' : 'English'}`;
+      case 'professional_summary':
+        prompt = `اكتب ملخصاً مهنياً قوياً ومؤثراً باللغة العربية للسوق المغربي.`;
         break;
-
-      case "job_description":
-        prompt = `Enhance this job experience description for a CV in ${language} language.
-        Input: ${JSON.stringify(input_data)}
-        Requirements:
-        - Use action verbs and quantifiable achievements
-        - Professional format suitable for ATS systems
-        - Highlight impact and results
-        - Maximum 3-4 bullet points
-        - Language: ${language === 'ar' ? 'Arabic' : language === 'fr' ? 'French' : 'English'}`;
+      
+      case 'experience_description':
+        prompt = `اكتب وصفاً مهنياً للخبرة: ${input_data.position} في ${input_data.company}`;
         break;
-
-      case "skills_optimization":
-        prompt = `Optimize and categorize these skills for a CV in ${language} language.
-        Input: ${JSON.stringify(input_data)}
-        Requirements:
-        - Categorize into technical and soft skills
-        - Add relevant keywords for ATS optimization
-        - Format as a clean list
-        - Include industry-relevant skills
-        - Language: ${language === 'ar' ? 'Arabic' : language === 'fr' ? 'French' : 'English'}`;
+      
+      case 'technical_skills':
+        prompt = `اقترح 5-7 مهارات تقنية مناسبة للسوق المغربي. أعط الإجابة كقائمة مفصولة بفواصل.`;
         break;
-
+      
+      case 'soft_skills':
+        prompt = `اقترح 5-7 مهارات شخصية مناسبة للسوق المغربي. أعط الإجابة كقائمة مفصولة بفواصل.`;
+        break;
+      
       default:
-        throw new Error("Invalid content type");
+        throw new Error(`Unsupported content type: ${content_type}`);
     }
 
     // Call OpenAI API
-    const openaiResponse = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
       headers: {
-        "Authorization": `Bearer ${openaiApiKey}`,
-        "Content-Type": "application/json",
+        'Authorization': `Bearer ${openAIApiKey}`,
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: "gpt-4",
+        model: 'gpt-4o-mini',
         messages: [
-          {
-            role: "system",
-            content: "You are an expert CV writer specializing in the Moroccan job market. Create professional, ATS-optimized content."
-          },
-          {
-            role: "user",
-            content: prompt
-          }
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: prompt }
         ],
         max_tokens: 500,
         temperature: 0.7,
       }),
     });
 
-    if (!openaiResponse.ok) {
-      throw new Error(`OpenAI API error: ${openaiResponse.status}`);
+    if (!response.ok) {
+      throw new Error(`OpenAI API error: ${response.status}`);
     }
 
-    const openaiData = await openaiResponse.json();
-    generatedContent = openaiData.choices[0].message.content;
+    const data = await response.json();
+    const generatedContent = data.choices[0].message.content;
 
-    // Record AI generation
-    await supabaseClient.from('ai_generations').insert({
-      user_id: user.id,
-      resume_id: resume_id,
-      generation_type: content_type,
-      input_data: input_data,
-      output_data: { content: generatedContent },
-      tokens_used: openaiData.usage?.total_tokens || 0
+    return new Response(JSON.stringify({ 
+      content: generatedContent,
+    }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 200,
     });
 
-    // Decrease AI generations remaining for free users
-    if (profile.subscription_tier === 'free') {
-      await supabaseClient
-        .from('profiles')
-        .update({ ai_generations_remaining: profile.ai_generations_remaining - 1 })
-        .eq('id', user.id);
-    }
-
-    return new Response(
-      JSON.stringify({ 
-        content: generatedContent,
-        generations_remaining: profile.subscription_tier === 'free' ? profile.ai_generations_remaining - 1 : -1
-      }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
-
   } catch (error) {
-    console.error('Error in ai-generate-content:', error);
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
-    );
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    logStep("ERROR", { message: errorMessage });
+    
+    return new Response(JSON.stringify({ 
+      error: errorMessage 
+    }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 500,
+    });
   }
 });

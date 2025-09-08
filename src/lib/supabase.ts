@@ -41,9 +41,15 @@ export const createResume = async (resumeData: {
   content: any;
   language?: string;
 }) => {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('User not authenticated');
+  
   const { data, error } = await supabase
     .from('resumes')
-    .insert(resumeData)
+    .insert({
+      ...resumeData,
+      user_id: user.id,
+    })
     .select()
     .single();
   
