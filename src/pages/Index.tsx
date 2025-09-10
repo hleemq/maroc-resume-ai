@@ -1,20 +1,51 @@
-import { Hero } from "@/components/Hero";
-import { Navigation } from "@/components/Navigation";
-import { Templates } from "@/components/Templates";
-import { Dashboard } from "@/components/Dashboard";
-import { useState } from "react";
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import { Hero } from '@/components/Hero';
+import { Navigation } from '@/components/Navigation';
+import { Templates } from '@/components/Templates';
 
-const Index = () => {
-  const [isLoggedIn] = useState(false); // This will be managed by auth later
+export default function Index() {
+  const navigate = useNavigate();
+  const { user } = useAuth();
 
-  if (isLoggedIn) {
-    return <Dashboard />;
-  }
+  const handleGetStarted = () => {
+    if (user) {
+      navigate('/dashboard');
+    } else {
+      navigate('/auth');
+    }
+  };
+
+  const handleCreateResume = () => {
+    if (user) {
+      navigate('/builder/new');
+    } else {
+      navigate('/auth');
+    }
+  };
+
+  const handleUploadCV = () => {
+    if (user) {
+      navigate('/upload');
+    } else {
+      navigate('/auth');
+    }
+  };
+
+  const handleSignIn = () => {
+    navigate('/auth');
+  };
 
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
-      <Hero />
+      <Navigation 
+        onGetStarted={handleGetStarted}
+        onSignIn={handleSignIn}
+      />
+      <Hero 
+        onCreateResume={handleCreateResume}
+        onUploadCV={handleUploadCV}
+      />
       <Templates />
       
       {/* Features Section */}
@@ -64,6 +95,4 @@ const Index = () => {
       </section>
     </div>
   );
-};
-
-export default Index;
+}

@@ -2,7 +2,12 @@ import { Button } from "@/components/ui/button";
 import { FileText, Menu, X } from "lucide-react";
 import { useState } from "react";
 
-export const Navigation = () => {
+interface NavigationProps {
+  onGetStarted?: () => void;
+  onSignIn?: () => void;
+}
+
+export const Navigation = ({ onGetStarted, onSignIn }: NavigationProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
@@ -29,10 +34,10 @@ export const Navigation = () => {
               Pricing
             </a>
             <div className="flex items-center space-x-3">
-              <Button variant="ghost" className="text-white hover:bg-white/20">
+              <Button variant="ghost" className="text-white hover:bg-white/20" onClick={onSignIn}>
                 Sign In
               </Button>
-              <Button variant="hero">
+              <Button variant="hero" onClick={onGetStarted}>
                 Get Started
               </Button>
             </div>
@@ -60,10 +65,10 @@ export const Navigation = () => {
               Pricing
             </a>
             <div className="flex flex-col space-y-3 pt-4">
-              <Button variant="ghost" className="text-white hover:bg-white/20">
+              <Button variant="ghost" className="text-white hover:bg-white/20" onClick={onSignIn}>
                 Sign In
               </Button>
-              <Button variant="hero">
+              <Button variant="hero" onClick={onGetStarted}>
                 Get Started
               </Button>
             </div>

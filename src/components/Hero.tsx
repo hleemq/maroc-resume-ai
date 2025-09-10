@@ -2,7 +2,12 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles, Users, FileCheck } from "lucide-react";
 import heroImage from "@/assets/hero-image.jpg";
 
-export const Hero = () => {
+interface HeroProps {
+  onCreateResume?: () => void;
+  onUploadCV?: () => void;
+}
+
+export const Hero = ({ onCreateResume, onUploadCV }: HeroProps) => {
   return (
     <section className="relative overflow-hidden bg-gradient-hero min-h-screen flex items-center">
       {/* Background Pattern */}
@@ -34,11 +39,11 @@ export const Hero = () => {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-              <Button variant="hero" size="lg" className="group">
+              <Button variant="hero" size="lg" className="group" onClick={onCreateResume}>
                 Create Your Resume
                 <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
               </Button>
-              <Button variant="heroSecondary" size="lg">
+              <Button variant="heroSecondary" size="lg" onClick={onUploadCV}>
                 Upload Existing CV
               </Button>
             </div>
