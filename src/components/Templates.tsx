@@ -1,52 +1,40 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Crown, Eye, FileText } from "lucide-react";
+import { Crown, Eye, FileText, Filter } from "lucide-react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { templates } from "@/components/ResumeTemplates";
 
 export const Templates = () => {
-  const templates = [
-    {
-      id: 1,
-      name: "Modern Professional",
-      description: "Clean and contemporary design perfect for tech roles",
-      isPremium: false,
-      image: "/api/placeholder/300/400",
-    },
-    {
-      id: 2,
-      name: "Executive Elite",
-      description: "Sophisticated layout for senior management positions",
-      isPremium: true,
-      image: "/api/placeholder/300/400",
-    },
-    {
-      id: 3,
-      name: "Creative Portfolio",
-      description: "Vibrant design for creative and marketing professionals",
-      isPremium: true,
-      image: "/api/placeholder/300/400",
-    },
-    {
-      id: 4,
-      name: "Academic Scholar",
-      description: "Traditional format ideal for academic positions",
-      isPremium: false,
-      image: "/api/placeholder/300/400",
-    },
-    {
-      id: 5,
-      name: "Startup Innovator",
-      description: "Dynamic layout for entrepreneurs and startup professionals",
-      isPremium: true,
-      image: "/api/placeholder/300/400",
-    },
-    {
-      id: 6,
-      name: "Classic Professional",
-      description: "Timeless design suitable for all industries",
-      isPremium: false,
-      image: "/api/placeholder/300/400",
-    },
-  ];
+  const [selectedCategory, setSelectedCategory] = useState<string>("All");
+  const navigate = useNavigate();
+  const { user, profile } = useAuth();
+
+  const categories = ["All", "Technology", "Executive", "Creative", "Academic", "Startup", "General", "Healthcare", "Finance", "Engineering", "Sales"];
+
+  const filteredTemplates = selectedCategory === "All" 
+    ? templates 
+    : templates.filter(template => template.category === selectedCategory);
+
+  const handleUseTemplate = (templateId: string, isPremium: boolean) => {
+    if (!user) {
+      navigate('/auth');
+      return;
+    }
+
+    if (isPremium && profile?.subscription_tier === 'free') {
+      navigate('/pricing');
+      return;
+    }
+
+    navigate(`/builder/new?template=${templateId}`);
+  };
+
+  const handlePreviewTemplate = (templateId: string) => {
+    // Open template preview in new tab or modal
+    window.open(`/template-preview/${templateId}`, '_blank');
+  };
 
   return (
     <section className="py-16 bg-muted/30">
@@ -60,8 +48,24 @@ export const Templates = () => {
           </p>
         </div>
 
+        {/* Category Filter */}
+        <div className="flex flex-wrap gap-2 mb-8 justify-center">
+          {categories.map((category) => (
+            <Button
+              key={category}
+              variant={selectedCategory === category ? "default" : "outline"}
+              size="sm"
+              onClick={() => setSelectedCategory(category)}
+              className="flex items-center gap-1"
+            >
+              <Filter className="w-3 h-3" />
+              {category}
+            </Button>
+          ))}
+        </div>
+
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {templates.map((template) => (
+          {filteredTemplates.map((template) => (
             <Card 
               key={template.id} 
               className="group relative overflow-hidden hover:shadow-elegant transition-all duration-300 cursor-pointer"
@@ -75,12 +79,22 @@ export const Templates = () => {
               
               <CardHeader className="p-0">
                 <div className="aspect-[3/4] bg-gradient-to-br from-muted to-muted/50 relative overflow-hidden">
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <FileText className="w-16 h-16 text-muted-foreground/30" />
-                  </div>
+                  <img 
+                    src={template.image} 
+                    alt={template.name}
+                    className="w-full h-full object-cover"
+                  />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     <div className="absolute bottom-4 left-4 right-4 flex gap-2">
-                      <Button size="sm" variant="heroSecondary" className="flex-1">
+                      <Button 
+                        size="sm" 
+                        variant="heroSecondary" 
+                        className="flex-1"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handlePreviewTemplate(template.id);
+                        }}
+                      >
                         <Eye className="w-4 h-4 mr-1" />
                         Preview
                       </Button>
@@ -88,8 +102,12 @@ export const Templates = () => {
                         size="sm" 
                         variant={template.isPremium ? "premium" : "hero"}
                         className="flex-1"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleUseTemplate(template.id, template.isPremium);
+                        }}
                       >
-                        {template.isPremium ? "Upgrade" : "Use Template"}
+                        {template.isPremium && profile?.subscription_tier === 'free' ? "Upgrade" : "Use Template"}
                       </Button>
                     </div>
                   </div>
@@ -97,7 +115,10 @@ export const Templates = () => {
               </CardHeader>
               
               <CardContent className="p-4">
-                <CardTitle className="text-lg mb-2">{template.name}</CardTitle>
+                <div className="flex items-center justify-between mb-2">
+                  <CardTitle className="text-lg">{template.name}</CardTitle>
+                  <span className="text-xs bg-muted px-2 py-1 rounded-full">{template.category}</span>
+                </div>
                 <CardDescription className="text-sm">
                   {template.description}
                 </CardDescription>
