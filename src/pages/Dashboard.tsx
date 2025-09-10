@@ -16,6 +16,10 @@ interface Resume {
   updated_at: string;
   template_id: string | null;
   is_public: boolean;
+  content: any;
+  language: string;
+  user_id: string;
+  created_at: string;
   resume_templates?: {
     name: string;
     is_premium: boolean;

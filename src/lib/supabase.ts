@@ -74,7 +74,6 @@ export const getUserResumes = async () => {
       *,
       resume_templates (
         name,
-        category,
         is_premium
       )
     `)

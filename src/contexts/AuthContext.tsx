@@ -6,13 +6,17 @@ import { toast } from '@/hooks/use-toast';
 interface Profile {
   id: string;
   email: string;
-  full_name?: string;
+  first_name?: string;
+  last_name?: string;
   phone?: string;
   location?: string;
   preferred_language?: string;
   profile_picture_url?: string;
   subscription_tier: 'free' | 'premium' | 'enterprise';
   ai_generations_remaining: number;
+  user_id: string;
+  created_at: string;
+  updated_at: string;
 }
 
 interface AuthContextType {
@@ -55,7 +59,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.error('Error loading profile:', error);
         return;
       }
-      setProfile(profileData);
+      setProfile({
+        ...profileData,
+        subscription_tier: profileData.subscription_tier as 'free' | 'premium' | 'enterprise'
+      });
     } catch (error) {
       console.error('Error loading profile:', error);
     }
@@ -198,7 +205,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (error) throw error;
 
-      setProfile(data);
+      setProfile({
+        ...data,
+        subscription_tier: data.subscription_tier as 'free' | 'premium' | 'enterprise'
+      });
       toast({
         title: "Profile updated",
         description: "Your profile has been updated successfully.",

@@ -120,7 +120,7 @@ export default function BuilderEdit() {
       
       // Populate form data
       if (data.content && typeof data.content === 'object') {
-        setResumeData(data.content as ResumeData);
+        setResumeData((data.content as unknown) as ResumeData);
       }
     } catch (error) {
       console.error('Error loading resume:', error);
