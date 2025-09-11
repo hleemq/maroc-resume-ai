@@ -70,15 +70,31 @@ export const ExecutiveElite = ({ data }: ExecutiveEliteProps) => {
         )}
 
         {/* Skills */}
-        {data.skills.length > 0 && (
+        {(data.skills.technical.length > 0 || data.skills.soft.length > 0 || data.skills.languages.length > 0) && (
           <div>
             <h2 className="text-2xl font-bold text-gray-900 mb-4 border-b-2 border-yellow-500 pb-2">Core Competencies</h2>
             <div className="grid grid-cols-2 gap-4">
-              {data.skills.map((skill, index) => (
-                <div key={index} className="bg-gray-50 p-3 rounded border-l-4 border-yellow-500">
+              {data.skills.technical.map((skill, index) => (
+                <div key={`tech-${index}`} className="bg-gray-50 p-3 rounded border-l-4 border-yellow-500">
                   <div className="flex justify-between">
-                    <span className="font-semibold text-gray-800">{skill.name}</span>
-                    <span className="text-yellow-600 font-bold">{skill.level}</span>
+                    <span className="font-semibold text-gray-800">{skill}</span>
+                    <span className="text-yellow-600 font-bold">Technical</span>
+                  </div>
+                </div>
+              ))}
+              {data.skills.soft.map((skill, index) => (
+                <div key={`soft-${index}`} className="bg-gray-50 p-3 rounded border-l-4 border-yellow-500">
+                  <div className="flex justify-between">
+                    <span className="font-semibold text-gray-800">{skill}</span>
+                    <span className="text-yellow-600 font-bold">Soft Skill</span>
+                  </div>
+                </div>
+              ))}
+              {data.skills.languages.map((lang, index) => (
+                <div key={`lang-${index}`} className="bg-gray-50 p-3 rounded border-l-4 border-yellow-500">
+                  <div className="flex justify-between">
+                    <span className="font-semibold text-gray-800">{lang.name}</span>
+                    <span className="text-yellow-600 font-bold">{lang.level}</span>
                   </div>
                 </div>
               ))}

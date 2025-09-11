@@ -80,16 +80,36 @@ export const CreativePortfolio = ({ data }: CreativePortfolioProps) => {
           )}
 
           {/* Skills */}
-          {data.skills.length > 0 && (
+          {(data.skills.technical.length > 0 || data.skills.soft.length > 0 || data.skills.languages.length > 0) && (
             <div>
               <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent mb-4">Skills</h2>
               <div className="space-y-3">
-                {data.skills.map((skill, index) => (
-                  <div key={index} className="bg-gradient-to-r from-purple-50 to-pink-50 p-3 rounded-lg">
+                {data.skills.technical.map((skill, index) => (
+                  <div key={`tech-${index}`} className="bg-gradient-to-r from-purple-50 to-pink-50 p-3 rounded-lg">
                     <div className="flex justify-between items-center">
-                      <span className="font-semibold text-gray-800">{skill.name}</span>
+                      <span className="font-semibold text-gray-800">{skill}</span>
                       <span className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-2 py-1 rounded-full text-xs font-bold">
-                        {skill.level}
+                        Technical
+                      </span>
+                    </div>
+                  </div>
+                ))}
+                {data.skills.soft.map((skill, index) => (
+                  <div key={`soft-${index}`} className="bg-gradient-to-r from-purple-50 to-pink-50 p-3 rounded-lg">
+                    <div className="flex justify-between items-center">
+                      <span className="font-semibold text-gray-800">{skill}</span>
+                      <span className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-2 py-1 rounded-full text-xs font-bold">
+                        Soft Skill
+                      </span>
+                    </div>
+                  </div>
+                ))}
+                {data.skills.languages.map((lang, index) => (
+                  <div key={`lang-${index}`} className="bg-gradient-to-r from-purple-50 to-pink-50 p-3 rounded-lg">
+                    <div className="flex justify-between items-center">
+                      <span className="font-semibold text-gray-800">{lang.name}</span>
+                      <span className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-2 py-1 rounded-full text-xs font-bold">
+                        {lang.level}
                       </span>
                     </div>
                   </div>

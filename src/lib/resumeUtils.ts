@@ -3,11 +3,13 @@ export interface PersonalInfo {
   email: string;
   phone: string;
   location: string;
+  title: string;
   website?: string;
   linkedin?: string;
 }
 
 export interface Experience {
+  id: string;
   company: string;
   position: string;
   startDate: string;
@@ -17,6 +19,7 @@ export interface Experience {
 }
 
 export interface Education {
+  id: string;
   institution: string;
   degree: string;
   field: string;
@@ -31,11 +34,20 @@ export interface Skill {
   level: 'Beginner' | 'Intermediate' | 'Advanced' | 'Expert';
 }
 
+export interface Skills {
+  technical: string[];
+  soft: string[];
+  languages: Array<{
+    name: string;
+    level: string;
+  }>;
+}
+
 export interface ResumeData {
   personal: PersonalInfo;
   experience: Experience[];
   education: Education[];
-  skills: Skill[];
+  skills: Skills;
   summary: string;
   language: string;
 }
@@ -46,12 +58,17 @@ export const createEmptyResumeData = (): ResumeData => ({
     email: '',
     phone: '',
     location: '',
+    title: '',
     website: '',
     linkedin: ''
   },
   experience: [],
   education: [],
-  skills: [],
+  skills: {
+    technical: [],
+    soft: [],
+    languages: []
+  },
   summary: '',
   language: 'ar'
 });

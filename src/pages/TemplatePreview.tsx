@@ -33,12 +33,14 @@ export default function TemplatePreview() {
       email: "john.doe@example.com",
       phone: "+212 6 12 34 56 78",
       location: "Casablanca, Morocco",
+      title: "Senior Manager",
       website: "www.johndoe.com",
       linkedin: "linkedin.com/in/johndoe"
     },
     summary: "Experienced professional with a proven track record of success in driving business growth and leading high-performing teams. Passionate about innovation and delivering exceptional results.",
     experience: [
       {
+        id: "1",
         company: "Tech Solutions Inc.",
         position: "Senior Manager",
         startDate: "2020",
@@ -47,6 +49,7 @@ export default function TemplatePreview() {
         description: "Led a team of 15+ professionals, increased department efficiency by 40%, and implemented strategic initiatives that resulted in $2M revenue growth."
       },
       {
+        id: "2",
         company: "Digital Innovations Ltd.",
         position: "Project Manager",
         startDate: "2018",
@@ -57,6 +60,7 @@ export default function TemplatePreview() {
     ],
     education: [
       {
+        id: "1",
         institution: "Hassan II University",
         degree: "Master's in Business Administration",
         field: "Strategic Management",
@@ -66,12 +70,15 @@ export default function TemplatePreview() {
         description: "Graduated with distinction, specializing in strategic management and business development."
       }
     ],
-    skills: [
-      { name: "Leadership", level: "Expert" as const },
-      { name: "Project Management", level: "Advanced" as const },
-      { name: "Strategic Planning", level: "Advanced" as const },
-      { name: "Data Analysis", level: "Intermediate" as const }
-    ]
+    skills: {
+      technical: ["Data Analysis", "Project Management Software", "CRM Systems"],
+      soft: ["Leadership", "Strategic Planning", "Team Management"],
+      languages: [
+        { name: "English", level: "Native" },
+        { name: "French", level: "Advanced" },
+        { name: "Arabic", level: "Intermediate" }
+      ]
+    }
   };
 
   const TemplateComponent = template.component;

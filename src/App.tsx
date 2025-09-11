@@ -8,6 +8,7 @@ import BuilderNew from '@/pages/BuilderNew';
 import BuilderEdit from '@/pages/BuilderEdit';
 import Upload from '@/pages/Upload';
 import Pricing from '@/pages/Pricing';
+import Templates from '@/pages/Templates';
 import TemplatePreview from '@/pages/TemplatePreview';
 import NotFound from '@/pages/NotFound';
 import './App.css';
@@ -84,6 +85,7 @@ function AppRoutes() {
         </ProtectedRoute>
       } />
       <Route path="/pricing" element={<Pricing />} />
+      <Route path="/templates" element={<Templates />} />
       <Route path="/template-preview/:templateId" element={<TemplatePreview />} />
       <Route path="*" element={<NotFound />} />
     </Routes>

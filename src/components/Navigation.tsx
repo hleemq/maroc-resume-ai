@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { FileText, Menu, X } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface NavigationProps {
   onGetStarted?: () => void;
@@ -9,6 +10,7 @@ interface NavigationProps {
 
 export const Navigation = ({ onGetStarted, onSignIn }: NavigationProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <nav className="absolute top-0 left-0 right-0 z-50 bg-white/10 backdrop-blur-md border-b border-white/20">
@@ -24,9 +26,12 @@ export const Navigation = ({ onGetStarted, onSignIn }: NavigationProps) => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            <a href="#templates" className="text-white/90 hover:text-white transition-colors">
+            <button 
+              onClick={() => navigate('/templates')} 
+              className="text-white/90 hover:text-white transition-colors"
+            >
               Templates
-            </a>
+            </button>
             <a href="#features" className="text-white/90 hover:text-white transition-colors">
               Features
             </a>
@@ -55,9 +60,12 @@ export const Navigation = ({ onGetStarted, onSignIn }: NavigationProps) => {
         {/* Mobile Navigation */}
         {isMenuOpen && (
           <div className="md:hidden py-4 space-y-4 bg-white/10 backdrop-blur-md border-t border-white/20">
-            <a href="#templates" className="block text-white/90 hover:text-white transition-colors py-2">
+            <button 
+              onClick={() => navigate('/templates')} 
+              className="block text-white/90 hover:text-white transition-colors py-2"
+            >
               Templates
-            </a>
+            </button>
             <a href="#features" className="block text-white/90 hover:text-white transition-colors py-2">
               Features
             </a>

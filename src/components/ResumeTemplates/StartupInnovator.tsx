@@ -90,19 +90,41 @@ export const StartupInnovator = ({ data }: StartupInnovatorProps) => {
           )}
 
           {/* Skills */}
-          {data.skills.length > 0 && (
+          {(data.skills.technical.length > 0 || data.skills.soft.length > 0 || data.skills.languages.length > 0) && (
             <div>
               <h2 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-pink-500 mb-4 flex items-center">
                 <span className="mr-2">⚡</span>Skills
               </h2>
               <div className="space-y-3">
-                {data.skills.map((skill, index) => (
-                  <div key={index} className="bg-gradient-to-r from-orange-50 to-pink-50 p-4 rounded-xl relative overflow-hidden">
+                {data.skills.technical.map((skill, index) => (
+                  <div key={`tech-${index}`} className="bg-gradient-to-r from-orange-50 to-pink-50 p-4 rounded-xl relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-orange-200 to-pink-200 opacity-20 rounded-full transform translate-x-8 -translate-y-8"></div>
                     <div className="flex justify-between items-center relative z-10">
-                      <span className="font-bold text-gray-800">{skill.name}</span>
+                      <span className="font-bold text-gray-800">{skill}</span>
                       <span className="bg-gradient-to-r from-orange-500 to-pink-500 text-white px-3 py-1 rounded-full text-xs font-bold">
-                        {skill.level}
+                        Technical
+                      </span>
+                    </div>
+                  </div>
+                ))}
+                {data.skills.soft.map((skill, index) => (
+                  <div key={`soft-${index}`} className="bg-gradient-to-r from-orange-50 to-pink-50 p-4 rounded-xl relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-orange-200 to-pink-200 opacity-20 rounded-full transform translate-x-8 -translate-y-8"></div>
+                    <div className="flex justify-between items-center relative z-10">
+                      <span className="font-bold text-gray-800">{skill}</span>
+                      <span className="bg-gradient-to-r from-orange-500 to-pink-500 text-white px-3 py-1 rounded-full text-xs font-bold">
+                        Soft Skill
+                      </span>
+                    </div>
+                  </div>
+                ))}
+                {data.skills.languages.map((lang, index) => (
+                  <div key={`lang-${index}`} className="bg-gradient-to-r from-orange-50 to-pink-50 p-4 rounded-xl relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-orange-200 to-pink-200 opacity-20 rounded-full transform translate-x-8 -translate-y-8"></div>
+                    <div className="flex justify-between items-center relative z-10">
+                      <span className="font-bold text-gray-800">{lang.name}</span>
+                      <span className="bg-gradient-to-r from-orange-500 to-pink-500 text-white px-3 py-1 rounded-full text-xs font-bold">
+                        {lang.level}
                       </span>
                     </div>
                   </div>

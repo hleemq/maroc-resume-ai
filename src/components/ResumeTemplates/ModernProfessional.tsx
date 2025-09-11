@@ -69,14 +69,26 @@ export const ModernProfessional = ({ data }: ModernProfessionalProps) => {
       )}
 
       {/* Skills */}
-      {data.skills.length > 0 && (
+      {(data.skills.technical.length > 0 || data.skills.soft.length > 0 || data.skills.languages.length > 0) && (
         <div>
           <h2 className="text-xl font-bold text-blue-600 mb-3 border-b border-gray-300 pb-1">Skills</h2>
           <div className="grid grid-cols-2 gap-2">
-            {data.skills.map((skill, index) => (
-              <div key={index} className="flex justify-between">
-                <span className="text-gray-800">{skill.name}</span>
-                <span className="text-blue-600 font-medium">{skill.level}</span>
+            {data.skills.technical.map((skill, index) => (
+              <div key={`tech-${index}`} className="flex justify-between">
+                <span className="text-gray-800">{skill}</span>
+                <span className="text-blue-600 font-medium">Technical</span>
+              </div>
+            ))}
+            {data.skills.soft.map((skill, index) => (
+              <div key={`soft-${index}`} className="flex justify-between">
+                <span className="text-gray-800">{skill}</span>
+                <span className="text-blue-600 font-medium">Soft Skill</span>
+              </div>
+            ))}
+            {data.skills.languages.map((lang, index) => (
+              <div key={`lang-${index}`} className="flex justify-between">
+                <span className="text-gray-800">{lang.name}</span>
+                <span className="text-blue-600 font-medium">{lang.level}</span>
               </div>
             ))}
           </div>

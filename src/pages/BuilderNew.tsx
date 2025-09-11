@@ -10,79 +10,29 @@ import { ExperienceStep } from '@/components/builder/ExperienceStep';
 import { EducationStep } from '@/components/builder/EducationStep';
 import { SkillsStep } from '@/components/builder/SkillsStep';
 import { SummaryStep } from '@/components/builder/SummaryStep';
+import { TemplateSelectionStep } from '@/components/builder/TemplateSelectionStep';
 import { createResume, getResumeTemplates } from '@/lib/supabase';
 import { toast } from '@/hooks/use-toast';
+import { ResumeData, createEmptyResumeData } from '@/lib/resumeUtils';
 
 const STEPS = [
-  { key: 'personal', title: 'المعلومات الشخصية', description: 'الاسم والمعلومات الأساسية' },
-  { key: 'experience', title: 'الخبرة المهنية', description: 'تاريخك المهني والوظائف السابقة' },
-  { key: 'education', title: 'التعليم', description: 'المؤهلات العلمية والشهادات' },
-  { key: 'skills', title: 'المهارات', description: 'المهارات التقنية والشخصية' },
-  { key: 'summary', title: 'الملخص المهني', description: 'نبذة عن خبرتك وأهدافك' },
+  { key: 'personal', title: 'Personal Information', description: 'Name and basic information' },
+  { key: 'experience', title: 'Work Experience', description: 'Your professional history and previous jobs' },
+  { key: 'education', title: 'Education', description: 'Academic qualifications and certificates' },
+  { key: 'skills', title: 'Skills', description: 'Technical and personal skills' },
+  { key: 'summary', title: 'Professional Summary', description: 'Overview of your experience and goals' },
+  { key: 'template', title: 'Choose Template', description: 'Select a professional template for your resume' },
 ];
 
-interface ResumeData {
-  personal: {
-    fullName: string;
-    email: string;
-    phone: string;
-    location: string;
-    title: string;
-  };
-  experience: Array<{
-    id: string;
-    company: string;
-    position: string;
-    startDate: string;
-    endDate: string;
-    current: boolean;
-    description: string;
-  }>;
-  education: Array<{
-    id: string;
-    institution: string;
-    degree: string;
-    field: string;
-    startDate: string;
-    endDate: string;
-    current: boolean;
-  }>;
-  skills: {
-    technical: string[];
-    soft: string[];
-    languages: Array<{
-      name: string;
-      level: string;
-    }>;
-  };
-  summary: string;
-}
 
 export default function BuilderNew() {
   const navigate = useNavigate();
-  const { user, loading, subscribed } = useAuth();
+  const { user, loading, profile } = useAuth();
   const [currentStep, setCurrentStep] = useState(0);
-  const [templates, setTemplates] = useState<any[]>([]);
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  const [resumeData, setResumeData] = useState<ResumeData>({
-    personal: {
-      fullName: '',
-      email: '',
-      phone: '',
-      location: '',
-      title: '',
-    },
-    experience: [],
-    education: [],
-    skills: {
-      technical: [],
-      soft: [],
-      languages: [],
-    },
-    summary: '',
-  });
+  const [resumeData, setResumeData] = useState<ResumeData>(createEmptyResumeData());
 
   useEffect(() => {
     if (!loading && !user) {
@@ -91,8 +41,7 @@ export default function BuilderNew() {
     }
     
     if (user) {
-      loadTemplates();
-      // Pre-fill user data
+      // Pre-fill user data  
       setResumeData(prev => ({
         ...prev,
         personal: {
@@ -104,22 +53,6 @@ export default function BuilderNew() {
     }
   }, [user, loading, navigate]);
 
-  const loadTemplates = async () => {
-    try {
-      const { data, error } = await getResumeTemplates();
-      if (error) {
-        console.error('Error loading templates:', error);
-        return;
-      }
-      setTemplates(data || []);
-      // Select first available template
-      if (data && data.length > 0) {
-        setSelectedTemplate(data[0].id);
-      }
-    } catch (error) {
-      console.error('Error loading templates:', error);
-    }
-  };
 
   const updateResumeData = (step: string, data: any) => {
     setResumeData(prev => ({
@@ -140,6 +73,8 @@ export default function BuilderNew() {
         return true; // Skills are optional
       case 4: // Summary
         return true; // Summary is optional
+      case 5: // Template
+        return selectedTemplate !== null;
       default:
         return false;
     }
@@ -160,8 +95,8 @@ export default function BuilderNew() {
   const handleFinish = async () => {
     if (!selectedTemplate) {
       toast({
-        title: "خطأ",
-        description: "يرجى اختيار نموذج للسيرة الذاتية",
+        title: "Error",
+        description: "Please select a template for your resume",
         variant: "destructive",
       });
       return;
@@ -171,32 +106,32 @@ export default function BuilderNew() {
     
     try {
       const { data, error } = await createResume({
-        title: resumeData.personal.fullName + ' - السيرة الذاتية',
+        title: resumeData.personal.fullName + ' - Resume',
         template_id: selectedTemplate,
         content: resumeData,
-        language: 'ar',
+        language: 'en',
       });
 
       if (error) {
         toast({
-          title: "خطأ",
-          description: "فشل في إنشاء السيرة الذاتية",
+          title: "Error",
+          description: "Failed to create resume",
           variant: "destructive",
         });
         return;
       }
 
       toast({
-        title: "تم بنجاح!",
-        description: "تم إنشاء سيرتك الذاتية بنجاح",
+        title: "Success!",
+        description: "Your resume has been created successfully",
       });
 
       navigate(`/builder/${data.id}`);
     } catch (error) {
       console.error('Error creating resume:', error);
       toast({
-        title: "خطأ",
-        description: "حدث خطأ غير متوقع",
+        title: "Error",
+        description: "An unexpected error occurred",
         variant: "destructive",
       });
     } finally {
@@ -218,7 +153,7 @@ export default function BuilderNew() {
           <ExperienceStep
             data={resumeData.experience}
             onChange={(data) => updateResumeData('experience', data)}
-            subscribed={subscribed}
+            subscribed={profile?.subscription_tier !== 'free'}
           />
         );
       case 2:
@@ -226,7 +161,7 @@ export default function BuilderNew() {
           <EducationStep
             data={resumeData.education}
             onChange={(data) => updateResumeData('education', data)}
-            subscribed={subscribed}
+            subscribed={profile?.subscription_tier !== 'free'}
           />
         );
       case 3:
@@ -234,7 +169,7 @@ export default function BuilderNew() {
           <SkillsStep
             data={resumeData.skills}
             onChange={(data) => updateResumeData('skills', data)}
-            subscribed={subscribed}
+            subscribed={profile?.subscription_tier !== 'free'}
           />
         );
       case 4:
@@ -242,7 +177,16 @@ export default function BuilderNew() {
           <SummaryStep
             data={resumeData.summary}
             onChange={(data) => updateResumeData('summary', data)}
-            subscribed={subscribed}
+            subscribed={profile?.subscription_tier !== 'free'}
+          />
+        );
+      case 5:
+        return (
+          <TemplateSelectionStep
+            selectedTemplate={selectedTemplate}
+            onSelectTemplate={setSelectedTemplate}
+            resumeData={resumeData}
+            subscriptionTier={profile?.subscription_tier}
           />
         );
       default:
@@ -266,9 +210,9 @@ export default function BuilderNew() {
       <header className="border-b bg-background/80 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold text-primary">إنشاء سيرة ذاتية جديدة</h1>
+            <h1 className="text-2xl font-bold text-primary">Create New Resume</h1>
             <Button variant="outline" onClick={() => navigate('/dashboard')}>
-              العودة للوحة التحكم
+              Back to Dashboard
             </Button>
           </div>
         </div>
@@ -284,7 +228,7 @@ export default function BuilderNew() {
                 <p className="text-sm text-muted-foreground">{STEPS[currentStep].description}</p>
               </div>
               <div className="text-sm text-muted-foreground">
-                {currentStep + 1} من {STEPS.length}
+                {currentStep + 1} of {STEPS.length}
               </div>
             </div>
             <Progress value={progress} className="w-full" />
@@ -305,8 +249,8 @@ export default function BuilderNew() {
                 onClick={handlePrevious}
                 disabled={currentStep === 0}
               >
-                <ChevronRight className="h-4 w-4 mr-2" />
-                السابق
+                <ChevronLeft className="h-4 w-4 mr-2" />
+                Previous
               </Button>
 
               <div className="flex gap-2">
@@ -325,7 +269,7 @@ export default function BuilderNew() {
                   onClick={handleFinish}
                   disabled={!canProceed() || isSubmitting}
                 >
-                  {isSubmitting ? 'جار الإنشاء...' : 'إنهاء وإنشاء السيرة الذاتية'}
+                  {isSubmitting ? 'Creating...' : 'Create Resume'}
                   <Sparkles className="h-4 w-4 ml-2" />
                 </Button>
               ) : (
@@ -333,8 +277,8 @@ export default function BuilderNew() {
                   onClick={handleNext}
                   disabled={!canProceed()}
                 >
-                  التالي
-                  <ChevronLeft className="h-4 w-4 ml-2" />
+                  Next
+                  <ChevronRight className="h-4 w-4 ml-2" />
                 </Button>
               )}
             </div>
