@@ -9,6 +9,7 @@ import BuilderEdit from '@/pages/BuilderEdit';
 import Upload from '@/pages/Upload';
 import Pricing from '@/pages/Pricing';
 import Templates from '@/pages/Templates';
+import ResumePreview from '@/pages/ResumePreview';
 import TemplatePreview from '@/pages/TemplatePreview';
 import NotFound from '@/pages/NotFound';
 import './App.css';
@@ -86,6 +87,11 @@ function AppRoutes() {
       } />
       <Route path="/pricing" element={<Pricing />} />
       <Route path="/templates" element={<Templates />} />
+      <Route path="/resume/:id" element={
+        <ProtectedRoute>
+          <ResumePreview />
+        </ProtectedRoute>
+      } />
       <Route path="/template-preview/:templateId" element={<TemplatePreview />} />
       <Route path="*" element={<NotFound />} />
     </Routes>

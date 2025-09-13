@@ -126,7 +126,8 @@ export default function BuilderNew() {
         description: "Your resume has been created successfully",
       });
 
-      navigate(`/builder/${data.id}`);
+      // Navigate to the resume preview page
+      navigate(`/resume/${data.id}`);
     } catch (error) {
       console.error('Error creating resume:', error);
       toast({
