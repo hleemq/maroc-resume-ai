@@ -4,6 +4,11 @@ import { ExecutiveElite } from "./ExecutiveElite";
 import { CreativePortfolio } from "./CreativePortfolio";
 import { AcademicScholar } from "./AcademicScholar";
 import { StartupInnovator } from "./StartupInnovator";
+import { ClassicProfessional } from "./ClassicProfessional";
+import { MedicalProfessional } from "./MedicalProfessional";
+import { FinanceExpert } from "./FinanceExpert";
+import { EngineeringProfessional } from "./EngineeringProfessional";
+import { SalesExecutive } from "./SalesExecutive";
 
 // Import template images
 import modernProfessionalImg from "@/assets/templates/modern-professional.jpg";
@@ -79,7 +84,7 @@ export const templates: Template[] = [
     description: "Timeless design suitable for all industries",
     isPremium: false,
     image: classicProfessionalImg,
-    component: AcademicScholar, // Reusing component for now
+    component: ClassicProfessional,
     category: "General"
   },
   {
@@ -88,7 +93,7 @@ export const templates: Template[] = [
     description: "Healthcare-focused layout for medical professionals",
     isPremium: true,
     image: medicalProfessionalImg,
-    component: ModernProfessional, // Reusing component for now
+    component: MedicalProfessional,
     category: "Healthcare"
   },
   {
@@ -97,7 +102,7 @@ export const templates: Template[] = [
     description: "Sophisticated design for financial industry professionals",
     isPremium: true,
     image: financeExpertImg,
-    component: ExecutiveElite, // Reusing component for now
+    component: FinanceExpert,
     category: "Finance"
   },
   {
@@ -106,7 +111,7 @@ export const templates: Template[] = [
     description: "Technical layout for engineering professionals",
     isPremium: true,
     image: engineeringProfessionalImg,
-    component: ModernProfessional, // Reusing component for now
+    component: EngineeringProfessional,
     category: "Engineering"
   },
   {
@@ -115,7 +120,7 @@ export const templates: Template[] = [
     description: "Dynamic design for sales and business development",
     isPremium: true,
     image: salesExecutiveImg,
-    component: StartupInnovator, // Reusing component for now
+    component: SalesExecutive,
     category: "Sales"
   }
 ];
